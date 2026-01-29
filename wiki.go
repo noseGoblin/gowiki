@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 )
@@ -32,8 +33,6 @@ func viewHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	p1 := &Page{Title: "TestPage", Body: []byte("This is a test page.")}
-	p1.save()
-	p2, _ := loadPage("TestPage")
-	fmt.Println(string(p2.Body))
+	http.HandleFunc("/view/", viewHandler)
+	log.Fatal(http.ListenAndServe(":8080", nil))
 }
