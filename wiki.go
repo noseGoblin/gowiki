@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"html/template"
 	"log"
 	"net/http"
@@ -19,17 +18,6 @@ func (p *Page) save() error {
 	return os.WriteFile(filename, p.Body, 0600)
 }
 
-var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
-
-func getTitle(w http.ResponseWriter, r *http.Request) (string, error) {
-  tit := validPath.FindStringSubmatch(r.URL.Path)
-  if tit != nil {
-    http.NotFound(w, r)
-    return "", errors.New("invalid Page Title")
-  }
-  return tit[2], nil
-}
-
 func loadPage(title string) (*Page, error) {
 	filename := title + ".txt"
 	body, err := os.ReadFile(filename)
@@ -37,16 +25,6 @@ func loadPage(title string) (*Page, error) {
 		return nil, err
 	}
 	return &Page{Title: title, Body: body}, nil
-}
-
-var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
-
-func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
-  err := templates.ExecuteTemplate(w, tmpl+".html", p)
-  if err != nil {
-    http.Error(w, err.Error(), http.StatusInternalServerError)
-    return
-  }
 }
 
 func viewHandler(w http.ResponseWriter, r *http.Request, title string) {
@@ -76,6 +54,18 @@ func saveHandler(w http.ResponseWriter, r *http.Request, title string) {
   }
   http.Redirect(w, r, "/view/"+title, http.StatusFound)
 }
+
+var templates = template.Must(template.ParseFiles("edit.html", "view.html"))
+
+func renderTemplate(w http.ResponseWriter, tmpl string, p *Page) {
+  err := templates.ExecuteTemplate(w, tmpl+".html", p)
+  if err != nil {
+    http.Error(w, err.Error(), http.StatusInternalServerError)
+    return
+  }
+}
+
+var validPath = regexp.MustCompile("^/(edit|save|view)/([a-zA-Z0-9]+)$")
 
 func makeHandler(fn func(http.ResponseWriter, *http.Request, string)) http.HandlerFunc {
   return func(w http.ResponseWriter, r *http.Request) {
