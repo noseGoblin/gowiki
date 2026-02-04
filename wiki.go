@@ -87,16 +87,16 @@ func handler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
   // Create a Gin router with default middleware (logger and recovery)
-  r := gin.Default()
+  router := gin.Default()
 
-  r.GET("/", func(c *gin.Context){
+  router.GET("/", func(c *gin.Context){
     // Return JSON response
     c.JSON(http.StatusOK, gin.H{
       "message": "Welcome to the wiki app!",
     })
   })
   
-  r.Run()
+  router.Run()
   // http.HandleFunc("/", handler)
   http.HandleFunc("/view/", makeHandler(viewHandler))
   http.HandleFunc("/edit/", makeHandler(editHandler))
