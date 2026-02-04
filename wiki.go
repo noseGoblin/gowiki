@@ -95,10 +95,19 @@ func main() {
       "message": "Welcome to the wiki app!",
     })
   })
+  router.GET("/view/:title", func(c *gin.Context){
+    title := c.Param("title")
+    p, err := loadPage(title)
+    if err != nil {
+      c.Redirect(http.StatusFound, "/edit/"+title)
+      return
+    }
+    c.JSON(http.StatusOK, p)
+  })
   
   router.Run()
   // http.HandleFunc("/", handler)
-  http.HandleFunc("/view/", makeHandler(viewHandler))
+  // http.HandleFunc("/view/", makeHandler(viewHandler))
   http.HandleFunc("/edit/", makeHandler(editHandler))
   http.HandleFunc("/save/", makeHandler(saveHandler))
   
