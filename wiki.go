@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"os"
 	"regexp"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Page struct {
@@ -84,7 +86,18 @@ func handler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-  http.HandleFunc("/", handler)
+  // Create a Gin router with default middleware (logger and recovery)
+  r := gin.Default()
+
+  r.GET("/", func(c *gin.Context){
+    // Return JSON response
+    c.JSON(http.StatusOK, gin.H{
+      "message": "Welcome to the wiki app!",
+    })
+  })
+  
+  r.Run()
+  // http.HandleFunc("/", handler)
   http.HandleFunc("/view/", makeHandler(viewHandler))
   http.HandleFunc("/edit/", makeHandler(editHandler))
   http.HandleFunc("/save/", makeHandler(saveHandler))
