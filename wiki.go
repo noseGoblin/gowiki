@@ -104,11 +104,19 @@ func main() {
     }
     c.JSON(http.StatusOK, p)
   })
+  router.GET("/edit/:title", func(c *gin.Context){
+    title := c.Param("title")
+    p, err := loadPage(title)
+    if err != nil {
+      p = &Page{Title: title}
+    }
+    c.JSON(http.StatusOK, p)
+  })
   
   router.Run()
   // http.HandleFunc("/", handler)
   // http.HandleFunc("/view/", makeHandler(viewHandler))
-  http.HandleFunc("/edit/", makeHandler(editHandler))
+  // http.HandleFunc("/edit/", makeHandler(editHandler))
   http.HandleFunc("/save/", makeHandler(saveHandler))
   
   log.Fatal(http.ListenAndServe(":8080", nil))
